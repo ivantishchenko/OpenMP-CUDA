@@ -1,7 +1,5 @@
 #include "mf.h"
 #include <algorithm> 
-#include <iostream>
-
 
 void mf(int ny, int nx, int hy, int hx, const float* in, float* out) {
     std::vector<float> window_elements; 
