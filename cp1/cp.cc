@@ -7,44 +7,34 @@ void correlate(int ny, int nx, const float* data, float* result) {
     double ** matrix = new double*[ny];
     for (int i = 0; i < ny; ++i)
         matrix[i] = new double[nx];
-    
+    // first optimization
     for ( int i = 0; i < ny; i++ ) {
         sum = 0;
         for ( int j = 0; j < nx; j++ ) {
             sum += data[j + i * nx];
         }
         sum = sum / nx;
-        for ( int j = 0; j < nx; j++ ) {
-            matrix[i][j] = data[j + i * nx] - sum;
-        }
-    }
-    
-    for ( int i = 0; i < ny; i++ ) {
         sum_sqr = 0;
         for ( int j = 0; j < nx; j++ ) {
+            matrix[i][j] = data[j + i * nx] - sum;
             sum_sqr += matrix[i][j] * matrix[i][j];
         }
         sum_sqr = std::sqrt(sum_sqr);
         for ( int j = 0; j < nx; j++ ) {
             matrix[i][j] /= sum_sqr;            
         }
-   
     }
-        
+    double sab, a, b, r;
     for ( int j = 0; j < ny; j++ ) {
         for ( int i = j; i < ny; i++ ) {
-            double sab = 0.0;
-
+            sab = 0.0;
             for (int x = 0; x < nx; x++) {
-                double a = matrix[i][x];
-                double b = matrix[j][x];
+                a = matrix[i][x];
+                b = matrix[j][x];
                 sab += a * b;
-           //     saa += a * a;
-             //   sbb += b * b;
             }
-            double r = nx * sab ;
-            r /= std::sqrt(nx);
-            r /= std::sqrt(nx);
+            r = nx * sab ;
+            r /= nx;
             result[i + j * ny] = r;
         }
     }
