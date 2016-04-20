@@ -2,7 +2,7 @@
 #include <algorithm> 
 
 void mf(int ny, int nx, int hy, int hx, const float* in, float* out) {
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for ( int i = 0; i < ny; i++ ) {
         int limit_y = std::min(ny, i + hy + 1);
         int beg_y = std::max(0, i - hy);
