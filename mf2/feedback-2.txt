@@ -1,0 +1,4 @@
+0
+OK!
+Note: adding the binaries (e.g. *.o and mf files) to the repository is unnecessary.
+Hint: You can speedup the solution by not allocating a new window_elements vector in the inner loop but recycling the same one (i.e., allocate it before the inner loop and just clear it every time when the loop starts).
