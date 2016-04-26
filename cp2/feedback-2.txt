@@ -1,0 +1,2 @@
+0
+No need to put binaries into the git repository. I think your losing some performance since you're using nested vectors
