@@ -16,18 +16,24 @@ void psort(int n, data_t* data) {
         int end = beg + parts;
         std::sort(data + beg, data + end);  
     }
-    
-    while ( nthrds > 1 ) {
+    bool flag = false;
+    while ( nthrds > 0 ) {
+        int parts = n / nthrds;
         #pragma omp parallel num_threads(nthrds) 
         {
-            int parts = n / nthrds; 
-            int id = omp_get_thread_num();
-            int beg = parts * id;
-            int end = beg + parts;
-            int mid = beg + parts / 2;
-            std::inplace_merge(data + beg, data + mid, data + end);
+                if (flag) {
+                    int id = omp_get_thread_num();
+                    int beg = parts * id;
+                    int end = beg + parts;
+                    int mid = beg + parts / 2;
+                    std::inplace_merge(data + beg, data + mid, data + end);
+                }
+                #pragma omp single 
+                {
+                    flag = true;
+                }
         }
         nthrds = nthrds / 2;
     }
-    std::inplace_merge(data, data + n / 2, data + n);
+    //std::inplace_merge(data, data + n / 2, data + n);
 }
