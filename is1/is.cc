@@ -68,15 +68,15 @@ Result segment(int ny, int nx, const float* data) {
     int tx1 = 0; 
     int ty1 = 0;
     double max_hXY = 0;
-    double4_t inner = double4_0;
-    double4_t outer = double4_0;
     
-    
-    
-    //h 1 w 1
     // DEBUG AND MAKE SURE SUMS_MATR is CORRECT
     #pragma omp parallel for schedule(dynamic)
     for ( int h = 1; h <= ny; h++ ) {
+          int lx0 = 0;
+          int ly0 = 0; 
+          int lx1 = 0; 
+          int ly1 = 0;
+          double lmax_hXY = 0;
         for ( int w = 1; w <= nx; w++ ) {
 
            if ( ny * nx != w * h)  {
@@ -92,24 +92,19 @@ Result segment(int ny, int nx, const float* data) {
                         double4_t vXc = sums_matrix[y1 * snx + x1] - sums_matrix[y1 * snx + x0] - sums_matrix[y0 * snx + x1] + sums_matrix[y0 * snx + x0];
                         double4_t vYc = vPc - vXc;
                         double4_t hXY4 = vXc * vXc * divX + vYc * vYc * divY;
+                      
                         double hXY = hXY4[0] + hXY4[1] + hXY4[2];
-                        if ( hXY > max_hXY ) {
-                            double4_t tmp_out = vYc * divY;
-                            double4_t tmp_inn = vXc * divX;
-                            #pragma omp critical 
-                            {
-                                if ( hXY > max_hXY ) {
-                                max_hXY = hXY;
-                                outer = tmp_out;
-                                inner = tmp_inn;
-                                tx0 = x0;
-                                ty0 = y0;
-                                tx1 = x1;
-                                ty1 = y1;
-                                asm ("#nop");
-                                
-                                }
-                            }
+                        if ( hXY > lmax_hXY ) {
+                            //double4_t tmp_out = vYc * divY;
+                            //double4_t tmp_inn = vXc * divX;
+                                lmax_hXY = hXY;
+                               // outer = tmp_out;
+                               // inner = tmp_inn;
+                                lx0 = x0;
+                                ly0 = y0;
+                                lx1 = x1;
+                                ly1 = y1;
+                                asm ("#nopnopnop");
                  
                         }
                    
@@ -117,15 +112,35 @@ Result segment(int ny, int nx, const float* data) {
                     }
                 }
             }
-         
+
         }
+        if ( lmax_hXY > max_hXY ) {
+                #pragma omp critical 
+                            {
+                                if ( lmax_hXY > max_hXY ) {
+                                max_hXY = lmax_hXY;
+                               // outer = tmp_out;
+                               // inner = tmp_inn;
+                                tx0 = lx0;
+                                ty0 = ly0;
+                                tx1 = lx1;
+                                ty1 = ly1;
+                                asm ("#nopnopnop");
+                                
+                                }
+                            }
+        }
+        
     }
-  
-    //float inner_final[3];
-    ///inner_final[0] = inner[0];
-    //inner_final[1] = inner[1];
-    //inner_final[2] = inner[2];
-    
+  int w = tx1 - tx0;
+  int h = ty1 - ty0;
+  double divX = 1.0 / (w * h);
+  double divY = 1.0 / (ny * nx  - w * h);
+  double4_t vXc = sums_matrix[ty1 * snx + tx1] - sums_matrix[ty1 * snx + tx0] - sums_matrix[ty0 * snx + tx1] + sums_matrix[ty0 * snx + tx0];
+  double4_t vYc = vPc - vXc;
+  double4_t inner = vXc * divX; 
+  double4_t outer = vYc * divY;
+
     //Result result { ty0, tx0, ty1, tx1, {0.322511, 0.404981, 0.809137}, {(float)inner[0], (float)inner[1], (float)inner[2]} };
     Result result { ty0, tx0, ty1, tx1, {(float)outer[0], (float)outer[1], (float)outer[2]}, {(float)inner[0], (float)inner[1], (float)inner[2]} };
     free(sums_matrix);
