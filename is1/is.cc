@@ -83,6 +83,10 @@ Result segment(int ny, int nx, const float* data) {
             double divX = 1.0 / (w * h);
             double divY = 1.0 / (ny * nx  - w * h);
                 
+                double divXdivY = divX + divY;
+                double4_t vPc2divY = 2 * vPc * divY;
+                double4_t vPcdivY = vPc * vPc * divY;
+                
                 for ( int y0 = 0; y0 <= ny - h; y0++ ) {
                     for ( int x0 = 0; x0 <= nx - w; x0++ ) {
                         int y1 = y0 + h;
@@ -90,9 +94,10 @@ Result segment(int ny, int nx, const float* data) {
 
                         // dirty fix here
                         double4_t vXc = sums_matrix[y1 * snx + x1] - sums_matrix[y1 * snx + x0] - sums_matrix[y0 * snx + x1] + sums_matrix[y0 * snx + x0];
-                        double4_t vYc = vPc - vXc;
-                        double4_t hXY4 = vXc * vXc * divX + vYc * vYc * divY;
-                      
+                        //double4_t vYc = vPc - vXc;
+                        double4_t hXY4 = vXc*(vXc*(divXdivY)-(vPc2divY)) + (vPcdivY);
+
+                        //double4_t hXY4 = vXc * vXc * divX + vYc * vYc * divY;
                         double hXY = hXY4[0] + hXY4[1] + hXY4[2];
                         if ( hXY > lmax_hXY ) {
                             //double4_t tmp_out = vYc * divY;
