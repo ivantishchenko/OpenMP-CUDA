@@ -12,7 +12,7 @@ Result segment(int ny, int nx, const float* data) {
     for ( int j = 0; j < ny + 1; j++ ) {
         sums_matrix[(nx + 1) * j] = double4_0;
     }
-    
+    /*
       for (int y = 0; y < ny; ++y) {
             double4_t sum = double4_0;
             for (int x = 0; x < nx; ++x) {
@@ -22,8 +22,7 @@ Result segment(int ny, int nx, const float* data) {
                 sums_matrix[ (x + 1) + (y + 1) * (nx + 1)] = sum + sums_matrix[ (x + 1) + y  * (nx + 1)];
             }
       }
-    
-    /*
+    */
     for (int y = 0; y < ny; ++y) {
         for (int x = 0; x < nx; ++x) {
 
@@ -42,7 +41,7 @@ Result segment(int ny, int nx, const float* data) {
             
         }
         //printf("\n");
-    }*/
+    }
    //printf("ALL SUMS\n");
     
     //printf("[%f,    %f,    %f] ", vPc[0], vPc[1], vPc[2]);
@@ -72,13 +71,18 @@ Result segment(int ny, int nx, const float* data) {
     double4_t inner = double4_0;
     double4_t outer = double4_0;
     
+    
+    
+    //h 1 w 1
     // DEBUG AND MAKE SURE SUMS_MATR is CORRECT
+    #pragma omp parallel for schedule(dynamic)
     for ( int h = 1; h <= ny; h++ ) {
         for ( int w = 1; w <= nx; w++ ) {
 
            if ( ny * nx != w * h)  {
             double divX = 1.0 / (w * h);
             double divY = 1.0 / (ny * nx  - w * h);
+                
                 for ( int y0 = 0; y0 <= ny - h; y0++ ) {
                     for ( int x0 = 0; x0 <= nx - w; x0++ ) {
                         int y1 = y0 + h;
@@ -90,15 +94,26 @@ Result segment(int ny, int nx, const float* data) {
                         double4_t hXY4 = vXc * vXc * divX + vYc * vYc * divY;
                         double hXY = hXY4[0] + hXY4[1] + hXY4[2];
                         if ( hXY > max_hXY ) {
-                            outer = vYc * divY;
-                            inner = vXc * divX;
-                            max_hXY = hXY;
-                            tx0 = x0;
-                            ty0 = y0;
-                            tx1 = x1;
-                            ty1 = y1;
-                            asm ("#nop");
+                            double4_t tmp_out = vYc * divY;
+                            double4_t tmp_inn = vXc * divX;
+                            #pragma omp critical 
+                            {
+                                if ( hXY > max_hXY ) {
+                                max_hXY = hXY;
+                                outer = tmp_out;
+                                inner = tmp_inn;
+                                tx0 = x0;
+                                ty0 = y0;
+                                tx1 = x1;
+                                ty1 = y1;
+                                asm ("#nop");
+                                
+                                }
+                            }
+                 
                         }
+                   
+                        
                     }
                 }
             }
