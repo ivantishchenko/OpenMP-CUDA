@@ -68,7 +68,7 @@ Result segment(int ny, int nx, const float* data) {
     int tx1 = 0; 
     int ty1 = 0;
     double max_hXY = 0;
-    
+    double4_t vPc_sqr = vPc * vPc;
     // DEBUG AND MAKE SURE SUMS_MATR is CORRECT
     #pragma omp parallel for schedule(dynamic)
     for ( int h = 1; h <= ny; h++ ) {
@@ -85,7 +85,7 @@ Result segment(int ny, int nx, const float* data) {
                 
                 double divXdivY = divX + divY;
                 double4_t vPc2divY = 2 * vPc * divY;
-                double4_t vPcdivY = vPc * vPc * divY;
+                double4_t vPcdivY = vPc_sqr * divY;
                 
                 for ( int y0 = 0; y0 <= ny - h; y0++ ) {
                     for ( int x0 = 0; x0 <= nx - w; x0++ ) {
