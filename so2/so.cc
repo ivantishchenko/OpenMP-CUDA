@@ -14,7 +14,22 @@
 
       data_t tmp;
 
-      data_t pivot = arr[(left + right) / 2];
+        data_t pivot;
+        int pivot_index = (left + right) / 2; 
+        int min_i = std::max(pivot_index - 3, 0);
+        int max_i = std::min(pivot_index + 3, right);
+        
+        if ( (arr[min_i] > arr[pivot_index] && arr[min_i] < arr[max_i] )|| (arr[min_i] > arr[max_i] && arr[min_i] < arr[pivot_index])) {
+            pivot = arr[min_i];
+        }
+        else if ((arr[max_i] > arr[pivot_index] && arr[max_i] < arr[min_i] )|| (arr[max_i] > arr[min_i] && arr[max_i] < arr[pivot_index])) {
+            pivot = arr[max_i];
+        }
+        else {
+            pivot = arr[(left + right) / 2];
+        }
+        
+     
 
     
 
