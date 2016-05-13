@@ -6,7 +6,7 @@
      
      
         if (nthrds < 2) {
-            std::sort(arr + left, arr + right); 
+            std::sort(arr + left, arr + right+1); 
             return;
         }
         
@@ -61,12 +61,14 @@
 
             
  }
+ 
+ 
  void psort(int n, data_t* data) {
      int nthrds = omp_get_max_threads();
 #pragma omp parallel 
 #pragma omp single 
    {
-       quickSort(data, 0, n, nthrds);
+       quickSort(data, 0, n - 1, nthrds);
    }
    /*
     int nthrds = omp_get_max_threads();
