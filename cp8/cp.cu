@@ -22,6 +22,10 @@ __global__ void medianKernel(float * output, const double * input, int ny, int n
     //output[index] = res; 
     /// CORELATE
  
+ 
+    if (y > x) {
+        return;
+    }
     double sab, a, b;
 
             sab = 0.0;
