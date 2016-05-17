@@ -1,0 +1,9 @@
+0
+
+Here is one simple approach that you can try:
+
+- Do not limit the number of tasks based on omp_get_max_threads.
+
+- Resort to std::sort for _small_ inputs, and otherwise simply create tasks recursively.
+
+OpenMP will run automatically a reasonable number of tasks in parallel, and the rest of them are queued. You can have a fairly large number of small tasks without losing too much. On the other hand, with fairly small tasks you will get a better load balancing, even if your choice of pivot is a bit off.

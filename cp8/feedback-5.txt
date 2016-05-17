@@ -1,0 +1,4 @@
+0
+
+Looks good, but please check for errors in all CUDA calls!
+CUDA functions may fail for numerous reasons.
