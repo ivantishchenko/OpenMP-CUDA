@@ -1,3 +1,0 @@
-0
-- The file looks a little messy with all the commented out code.
-- The solution itself seems fine.

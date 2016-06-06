@@ -1,1 +1,1 @@
-# solutions-ivantishchenko
+# My repo for OpenMP and CUDA

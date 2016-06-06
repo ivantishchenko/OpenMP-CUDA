@@ -1,2 +1,0 @@
-0
-Looks OK. It would probably simpler to just allocate a single nx * ny float array and index it as the input/output array.

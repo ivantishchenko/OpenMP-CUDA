@@ -1,5 +1,0 @@
--1
-- Your code incorrectly assumes the number of threads is a power of two, and that the input length is divisible by the number of threads. For example, try the following commands:
-OMP_NUM_THREADS=12 ./so-test 1200
-./so-test 1001
-- Worse: There is a data race on the first iteration of the while loop. Any number from 0 to nthrds-1 threads can enter the if(flag) block. The code happens to work because that block then does merges within already sorted sections of the data. I guess you've intended the flag to just skip the first iteration, so why not just set nthrds to whatever it should be when you actually start doing something useful.
